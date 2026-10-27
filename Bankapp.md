@@ -3,31 +3,36 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <assert.h>
 
 #define SIZE_OF_NAME_BUFFER 20
 #define SIZE_OF_USER 50
 #define SIZE_OF_NUMBER 11
 
-enum currency{
+enum currency
+{
     NAIRA,
     DOLLAR,
     POUND,
 };
 
-enum transcation_type{
+enum transcation_type
+{
     CREDIT,
     DEBIT,
     RECHARGE_CARD
 };
 
-struct account{
+struct account
+{
     int id;
     char account_number[20];
     float balance;
     enum currency currency_type;
 };
 
-struct transact{
+struct transact
+{
     char date[30];
     int user_id;
     int id;
@@ -36,7 +41,8 @@ struct transact{
     enum transcation_type type;
 };
 
-struct User_Details {
+struct User_Details
+{
     char First_Name[SIZE_OF_NAME_BUFFER];
     char Middle_Name[SIZE_OF_NAME_BUFFER];
     char Last_Name[SIZE_OF_NAME_BUFFER];
@@ -46,7 +52,6 @@ struct User_Details {
     int id;
 };
 
-
 const struct User_Details dummy_user = {
     .First_Name = "John",
     .Middle_Name = "Doe",
@@ -54,10 +59,10 @@ const struct User_Details dummy_user = {
     .Nin_Bvn = "12345678901",
     .Phone_Number = "08012345678",
     .Password = "password123",
-    .id = 1
-};
+    .id = 1};
 
-static const char* currency_enum_to_string(enum currency type_){
+static const char *currency_enum_to_string(enum currency type_)
+{
     switch (type_)
     {
     case NAIRA:
@@ -66,13 +71,14 @@ static const char* currency_enum_to_string(enum currency type_){
         return "DOLLAR";
     case POUND:
         return "POUND";
-    
+
     default:
         return "UNKNOWN CURRENCY";
     }
 }
-static const char* transaction_type_enum_to_string(enum transcation_type type_){
-    switch (type_)
+static const char *transaction_type_enum_to_string(enum transcation_type type)
+{
+    switch (type)
     {
     case CREDIT:
         return "CREDIT";
@@ -80,14 +86,14 @@ static const char* transaction_type_enum_to_string(enum transcation_type type_){
         return "DEBIT";
     case RECHARGE_CARD:
         return "RECHARGE_CARD";
-    
+
     default:
         return "UNKNOWN TRANSACTION";
     }
-
 }
 
-static void print_user(struct User_Details details){
+static void print_user(struct User_Details details)
+{
     printf("\nUSER DETAILS\n");
     printf("First Name: %s\n", details.First_Name);
     printf("Middle Name: %s\n", details.Middle_Name);
@@ -96,9 +102,10 @@ static void print_user(struct User_Details details){
     printf("Password: %s\n\n", details.Password);
 }
 
-static void print_transaction(struct transact transaction){
+static void print_transaction(struct transact transaction)
+{
     printf("\nTRANSACTION DETAILS\n");
-    printf("id: %d\n", transaction.id);
+    printf("Transaction ID: %d\n", transaction.id);
     printf("User ID: %d\n", transaction.user_id);
     printf("Account Number: %s\n", transaction.account_num);
     printf("Amount: %d\n", transaction.amount);
@@ -106,26 +113,41 @@ static void print_transaction(struct transact transaction){
     printf("Date: %s\n", transaction.date);
 }
 
-static void print_account(struct account account){
+static void print_account(struct account account)
+{
     printf("\nACCOUNT DETAILS\n");
-    printf("id: %d\n", account.id);
+    printf("Account ID: %d\n", account.id);
     printf("Account Number: %s\n", account.account_number);
     printf("Balance: %.2f\n\n", account.balance);
     printf("Currency Type: %s\n", currency_enum_to_string(account.currency_type));
 }
-bool register_account(struct account account_array[0], struct account account_details){
-    for(int i = 0; i < SIZE_OF_USER; i++){
-        if(account_array[i].id == 0){
-            account_array[i] =account_details;
+
+bool register_account(struct account account_array[0], struct account account_details)
+{
+    assert(account_array != NULL);
+    assert(account_details.id > 0);
+
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (account_array[i].id == 0)
+        {
+            account_array[i] = account_details;
             return true;
         }
     }
     return false;
 }
 
-bool read_account(struct account account_array[], int id, struct account* account_details){
-    for(int i = 0; i < SIZE_OF_USER; i++){
-        if(account_array[i].id == id){
+bool read_account(struct account account_array[], int id, struct account *account_details)
+{
+    assert(account_array != NULL);
+    assert(id > 0);
+    assert(account_details != NULL);
+
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (account_array[i].id == id)
+        {
             *account_details = account_array[i];
             return true;
         }
@@ -133,9 +155,31 @@ bool read_account(struct account account_array[], int id, struct account* accoun
     return false;
 }
 
-bool delete_account(struct account account_array[], int id){
-    for(int i = 0; i < SIZE_OF_USER; i++){
-        if(account_array[i].id == id){
+bool update_account(struct account account_array[], struct account account_details, int id)
+{
+    assert(account_array != NULL);
+    assert(account_details.id > 0);
+
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (account_array[i].id == id)
+        {
+            account_array[i] = account_details;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool delete_account(struct account account_array[], int id)
+{
+    assert(account_array != NULL);
+    assert(id > 0);
+
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (account_array[i].id == id)
+        {
             account_array[i].id = 0;
             return true;
         }
@@ -143,18 +187,12 @@ bool delete_account(struct account account_array[], int id){
     return false;
 }
 
-bool update_account(struct account account_array[], struct account account_details, int id){
-    for(int i = 0; i < SIZE_OF_USER; i++){
-        if(account_array[i].id == id){
-            account_array[i] = account_details;
-            return true;
-        }
-    }
-    return false;
-}
-bool register_transaction(struct transact transaction_array[], struct transact transaction){
-    for (int i = 0; i < SIZE_OF_USER; i++){
-        if (transaction_array[i].id == 0){
+bool register_transaction(struct transact transaction_array[], struct transact transaction)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (transaction_array[i].id == 0)
+        {
             transaction_array[i] = transaction;
             return true;
         }
@@ -162,10 +200,13 @@ bool register_transaction(struct transact transaction_array[], struct transact t
     return false;
 }
 
-bool read_transaction(struct transact transaction_array[], int id, struct transact* transaction_details){
+bool read_transaction(struct transact transaction_array[], int id, struct transact *transaction_details)
+{
     bool found = false;
-    for (int i = 0; i < SIZE_OF_USER; i++){
-        if(transaction_array[i].id == id){
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (transaction_array[i].id == id)
+        {
             *transaction_details = transaction_array[i];
             found = true;
         }
@@ -173,9 +214,12 @@ bool read_transaction(struct transact transaction_array[], int id, struct transa
     return found;
 }
 
-bool update_transcation(struct transact transcation_array[], struct transact transcation, int id){
-    for(int i = 0; i < SIZE_OF_USER; i++){
-        if(transcation_array[i].id == id){
+bool update_transcation(struct transact transcation_array[], struct transact transcation, int id)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (transcation_array[i].id == id)
+        {
             transcation_array[i] = transcation;
             return true;
         }
@@ -183,36 +227,48 @@ bool update_transcation(struct transact transcation_array[], struct transact tra
     return false;
 }
 
-bool delete_transcation(struct transact transaction_array[], int id){
-    for(int i = 0; i < SIZE_OF_USER; i++){
-        if(transaction_array[i].id == id){
+bool delete_transcation(struct transact transaction_array[], int id)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (transaction_array[i].id == id)
+        {
             transaction_array[i].id = 0;
             return true;
         }
     }
     return false;
 }
-bool Is_Number(char number[]){
-    for(int i = 0; number[i] != '\0'; i++){
-        if (!isdigit((unsigned char) number[i])){
+bool Is_Number(char number[])
+{
+    for (int i = 0; number[i] != '\0'; i++)
+    {
+        if (!isdigit((unsigned char)number[i]))
+        {
             return false;
         }
     }
     return true;
 }
 
-bool Is_Alphabet(char name[]){
-    for(int i = 0; name[i] != '\0'; i++){
-         if (!isalpha ((unsigned char) name[i])){
+bool Is_Alphabet(char name[])
+{
+    for (int i = 0; name[i] != '\0'; i++)
+    {
+        if (!isalpha((unsigned char)name[i]))
+        {
             return false;
         }
     }
     return true;
 }
 
-bool Register_User(struct User_Details user_array[], struct User_Details bank){
-    for (int i = 0; i < SIZE_OF_USER; i++){
-        if (user_array[i].id == 0){
+bool Register_User(struct User_Details user_array[], struct User_Details bank)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (user_array[i].id == 0)
+        {
             user_array[i] = bank;
             return true;
         }
@@ -220,9 +276,12 @@ bool Register_User(struct User_Details user_array[], struct User_Details bank){
     return false;
 }
 
-bool Update_User(struct User_Details user_array[], struct User_Details bank){
-    for (int i = 0; i < SIZE_OF_USER; i++){
-        if (user_array[i].id == bank.id){
+bool Update_User(struct User_Details user_array[], struct User_Details bank)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (user_array[i].id == bank.id)
+        {
             user_array[i] = bank;
             return true;
         }
@@ -230,9 +289,12 @@ bool Update_User(struct User_Details user_array[], struct User_Details bank){
     return false;
 }
 
-bool Read_User(struct User_Details user_array[], int id, struct User_Details* user_details){
-    for (int i = 0; i < SIZE_OF_USER; i++){
-        if(user_array[i].id == id){
+bool Read_User(struct User_Details user_array[], int id, struct User_Details *user_details)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (user_array[i].id == id)
+        {
             *user_details = user_array[i];
             return true;
         }
@@ -240,9 +302,12 @@ bool Read_User(struct User_Details user_array[], int id, struct User_Details* us
     return false;
 }
 
-bool Delete_User(struct User_Details user_array[], int id){
-    for (int i = 0; i < SIZE_OF_USER; i++){
-        if(user_array[i].id == id){
+bool Delete_User(struct User_Details user_array[], int id)
+{
+    for (int i = 0; i < SIZE_OF_USER; i++)
+    {
+        if (user_array[i].id == id)
+        {
             user_array[i].id = 0;
             return true;
         }
@@ -250,14 +315,15 @@ bool Delete_User(struct User_Details user_array[], int id){
     return false;
 }
 
-int main() {
+int main()
+{
     struct User_Details user_array[SIZE_OF_USER] = {0};
     struct User_Details bank;
     struct transact transaction_array[SIZE_OF_USER] = {0};
     struct transact transaction;
     struct account account_array[SIZE_OF_USER] = {0};
     struct account account_details;
-    struct tm* ptr;
+    struct tm *ptr;
     time_t t;
     t = time(NULL);
     ptr = localtime(&t);
@@ -274,95 +340,119 @@ int main() {
 
     printf("WELCOME TO ANDERSONBANK\n\n");
 
-    while (1){
+    while (1)
+    {
 
-    printf("Enter 1 to Register user\n");
-    printf("Enter 2 to Update user\n");
-    printf("Enter 3 to Read user\n");
-    printf("Enter 4 to Delete user\n");
-    printf("Enter 5 to Transact\n");
-    printf("Enter 6 to Read Transaction\n");
-    printf("Enter 7 to Update Transaction\n");
-    printf("Enter 8 to Delete Transcation\n");
-    printf("Enter 9 to Use Dummy User Data\n");
-    printf("Enter 10 to Register Account\n");
-    printf("Enter 11 to Read Account\n");
-    printf("Enter 12 to Update Account\n");
-    printf("Enter 13 to Delete Account\n");
-    printf("Choice: ");
-    scanf("%d", &choice);
+        printf("Enter 1 to Register user\n");
+        printf("Enter 2 to Update user\n");
+        printf("Enter 3 to Read user\n");
+        printf("Enter 4 to Delete user\n");
+        printf("Enter 5 to Transact\n");
+        printf("Enter 6 to Read Transaction\n");
+        printf("Enter 7 to Update Transaction\n");
+        printf("Enter 8 to Delete Transcation\n");
+        printf("Enter 9 to Use Dummy User Data\n");
+        printf("Enter 10 to Register Account\n");
+        printf("Enter 11 to Read Account\n");
+        printf("Enter 12 to Update Account\n");
+        printf("Enter 13 to Delete Account\n");
+        printf("Choice: ");
+        scanf("%d", &choice);
 
-        if(choice == 1){
-            while(1){
+        if (choice == 1)
+        {
+            while (1)
+            {
                 printf("Enter Your First Name: ");
                 scanf("%s", bank.First_Name);
-                    if(strlen(bank.First_Name) >= SIZE_OF_NAME_BUFFER){
-                        printf("\nError, Name Should not be more than 20 character\n");
-                    }
-                        else if (!Is_Alphabet(bank.First_Name)){
-                            printf("\nInvalid, enter Alphabet only\n\n");
-                            }
-                            else{
-                                break;
-                            }
+                if (strlen(bank.First_Name) >= SIZE_OF_NAME_BUFFER)
+                {
+                    printf("\nError, Name Should not be more than 20 character\n");
+                }
+                else if (!Is_Alphabet(bank.First_Name))
+                {
+                    printf("\nInvalid, enter Alphabet only\n\n");
+                }
+                else
+                {
+                    break;
+                }
             }
-            while(1){
+            while (1)
+            {
                 printf("Enter Your Middle Name: ");
                 scanf("%s", bank.Middle_Name);
-                    if(strlen(bank.Middle_Name) >= SIZE_OF_NAME_BUFFER){
-                        printf("\nError, Name Should not be more than 20 character\n");
-                    }
-                        else if (!Is_Alphabet(bank.Middle_Name)){
-                            printf("\nInvalid, enter Alphabet only\n\n");
-                            }
-                            else{
-                                break;
-                            }
+                if (strlen(bank.Middle_Name) >= SIZE_OF_NAME_BUFFER)
+                {
+                    printf("\nError, Name Should not be more than 20 character\n");
+                }
+                else if (!Is_Alphabet(bank.Middle_Name))
+                {
+                    printf("\nInvalid, enter Alphabet only\n\n");
+                }
+                else
+                {
+                    break;
+                }
             }
-            while(1){
+            while (1)
+            {
                 printf("Enter Your Last Name: ");
                 scanf("%s", bank.Last_Name);
-                    if(strlen(bank.Last_Name) >= SIZE_OF_NAME_BUFFER){
-                        printf("\nError, Name Should not be more than 20 character\n");
-                    }
-                    else if (!Is_Alphabet(bank.Last_Name)){
-                            printf("\nInvalid, enter Alphabet only\n\n");
-                            }
-                            else{
-                                break;
-                            }
+                if (strlen(bank.Last_Name) >= SIZE_OF_NAME_BUFFER)
+                {
+                    printf("\nError, Name Should not be more than 20 character\n");
+                }
+                else if (!Is_Alphabet(bank.Last_Name))
+                {
+                    printf("\nInvalid, enter Alphabet only\n\n");
+                }
+                else
+                {
+                    break;
+                }
             }
-            while(1){
+            while (1)
+            {
                 printf("Enter Your Nin/Bvn: ");
                 scanf("%11s", bank.Nin_Bvn);
-                    if(strlen(bank.Nin_Bvn) > SIZE_OF_NUMBER){
-                        printf("\nError, Number Should not be more than 11 Characters\n\n");
-                    }
-                   else if(strlen(bank.Nin_Bvn) < SIZE_OF_NUMBER){
-                        printf("\nError, Number Should not be less than 11 Characters\n\n");
-                    }
-                        else if(!Is_Number(bank.Nin_Bvn)){
-                            printf("\nInvalid, enter Number only\n\n");
-                        }
-                        else{
-                            break;
-                        }
+                if (strlen(bank.Nin_Bvn) > SIZE_OF_NUMBER)
+                {
+                    printf("\nError, Number Should not be more than 11 Characters\n\n");
+                }
+                else if (strlen(bank.Nin_Bvn) < SIZE_OF_NUMBER)
+                {
+                    printf("\nError, Number Should not be less than 11 Characters\n\n");
+                }
+                else if (!Is_Number(bank.Nin_Bvn))
+                {
+                    printf("\nInvalid, enter Number only\n\n");
+                }
+                else
+                {
+                    break;
+                }
             }
-            while(1){
+            while (1)
+            {
                 printf("Enter Your Phone Number: ");
                 scanf("%11s", bank.Phone_Number);
-                    if(strlen(bank.Phone_Number) > SIZE_OF_NUMBER){
-                        printf("\nError, Number Should not be more than 11 Character\n\n");
-                    }
-                    else if(strlen(bank.Phone_Number) < SIZE_OF_NUMBER){
-                        printf("\nError, Number Should not be less than 11 Characters\n\n");
-                    }
-                        else if(!Is_Number(bank.Phone_Number)){
-                            printf("\nInvalid, enter Number only\n\n");
-                        }
-                        else{
-                            break;
-                        }
+                if (strlen(bank.Phone_Number) > SIZE_OF_NUMBER)
+                {
+                    printf("\nError, Number Should not be more than 11 Character\n\n");
+                }
+                else if (strlen(bank.Phone_Number) < SIZE_OF_NUMBER)
+                {
+                    printf("\nError, Number Should not be less than 11 Characters\n\n");
+                }
+                else if (!Is_Number(bank.Phone_Number))
+                {
+                    printf("\nInvalid, enter Number only\n\n");
+                }
+                else
+                {
+                    break;
+                }
             }
 
             printf("Enter Password: ");
@@ -371,109 +461,150 @@ int main() {
             bank.id = user_store_index;
             printf("Your ID is: %d\n", bank.id);
 
-            if (Register_User(user_array, bank)) {
+            if (Register_User(user_array, bank))
+            {
                 user_store_index++;
                 printf("\nUSER REGISTERED SUCCESSFULLY\n\n");
-            } else {
+            }
+            else
+            {
                 printf("\nREGISTRATION FAILED, Bank system is full\n\n");
             }
         }
-        else if(choice == 2){
+
+        else if (choice == 2)
+        {
             printf("Enter your ID to update: ");
             scanf("%d", &bank.id);
 
-            while(1){
-                printf("Enter Your New First Name: ");
-                scanf("%s", bank.First_Name);
-                    if(strlen(bank.First_Name) >= SIZE_OF_NAME_BUFFER){
-                        printf("\nError, Name Should not be more than 20 character\n");
-                    }
-                        else if (!Is_Alphabet(bank.First_Name)){
-                            printf("Invalid, enter Alphabet only\n");
-                            }
-                            else{
-                                break;
-                            }
-            }
-            while(1){
-                printf("Enter Your New Middle Name: ");
-                scanf("%s", bank.Middle_Name);
-                    if(strlen(bank.Middle_Name) >= SIZE_OF_NAME_BUFFER){
-                        printf("\nError, Name Should not be more than 20 character\n");
-                    }
-                        if (!Is_Alphabet(bank.Middle_Name)){
-                            printf("Invalid, enter Alphabet only\n");
-                            }
-                            else{
-                                break;
-                            }
-            }
-            while(1){
-                printf("Enter Your New Last Name: ");
-                scanf("%s", bank.Last_Name);
-                    if(strlen(bank.Last_Name) >= SIZE_OF_NAME_BUFFER){
-                        printf("\nError, Name Should not be more than 20 character\n");
-                    }
-                        if (!Is_Alphabet(bank.Last_Name)){
-                            printf("Invalid, enter Alphabet only\n");
-                            }
-                            else{
-                              break;
-                            }
-            }
-            while(1){
-                printf("Enter Your Phone Number: ");
-                scanf("%11s", bank.Phone_Number);
-                    if(strlen(bank.Phone_Number) > SIZE_OF_NUMBER){
-                        printf("\nError, Number Should not be more than 11 Character\n\n");
-                    }
-                    else if(strlen(bank.Phone_Number) < SIZE_OF_NUMBER){
-                        printf("\nError, Number Should not be less than 11 Characters\n\n");
-                    }
-                        if(!Is_Number(bank.Phone_Number)){
-                            printf("\nInvalid, enter Number only\n\n");
-                        }
-                        else{
-                            break;
-                        }
-            }
-
-            printf("Enter your New Password: ");
-            scanf("%s", bank.Password);
-
-            if(Update_User(user_array, bank)){
-                printf("\nUser Updated Successfully\n\n");
-            }
-            else{
+            if (!Read_User(user_array, bank.id, &bank))
+            {
                 printf("\nUser Not Found\n\n");
             }
-        }
+            else
+            {
+                while (1)
+                {
+                    printf("Enter Your New First Name: ");
+                    scanf("%19s", bank.First_Name);
 
-        else if(choice == 3){
+                    if (!Is_Alphabet(bank.First_Name))
+                    {
+                        printf("Invalid, enter Alphabet only\n");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                while (1)
+                {
+                    printf("Enter Your New Middle Name: ");
+                    scanf("%19s", bank.Middle_Name);
+
+                    if (!Is_Alphabet(bank.Middle_Name))
+                    {
+                        printf("Invalid, enter Alphabet only\n");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                while (1)
+                {
+                    printf("Enter Your New Last Name: ");
+                    scanf("%19s", bank.Last_Name);
+
+                    if (!Is_Alphabet(bank.Last_Name))
+                    {
+                        printf("Invalid, enter Alphabet only\n");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                while (1)
+                {
+                    printf("Enter Your Phone Number: ");
+                    scanf("%11s", bank.Phone_Number);
+
+                    if (strlen(bank.Phone_Number) != 11 ||
+                        !Is_Number(bank.Phone_Number))
+                    {
+                        printf("Invalid phone number. Enter 11 digits.\n");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                printf("Enter your New Password: ");
+                scanf("%s", bank.Password);
+
+                if (Update_User(user_array, bank))
+                {
+                    printf("\nUser Updated Successfully\n\n");
+                }
+                else
+                {
+                    printf("\nUser Not Found\n\n");
+                }
+            }
+        }
+        else if (choice == 3)
+        {
             printf("Enter User ID: ");
             scanf("%d", &id);
-            if(!Read_User(user_array, id, &bank)){
+            if (!Read_User(user_array, bank.id, &bank))
+            {
                 printf("\nUser Not Found\n\n");
             }
-            print_user(bank);
-        }                     
-
-        else if(choice == 4){
-            printf("Enter Your ID to Delete: ");
-            scanf("%d", &id);
-            if(Delete_User(user_array, id)){
-                printf("\nAccount Deleted Successfully\n\n");
-            }else{
-                printf("\nUser Not Found\n\n");
+            else
+            {
+                if (!Read_User(user_array, id, &bank))
+                {
+                    printf("\nUser Not Found\n\n");
+                }
+                print_user(bank);
             }
         }
 
-        else if(choice == 5){
-            while(1){
+        else if (choice == 4)
+        {
+            printf("Enter Your ID to Delete: ");
+            scanf("%d", &id);
+            if (!Read_User(user_array, bank.id, &bank))
+            {
+                printf("\nUser Not Found\n\n");
+            }
+            else
+            {
+                if (Delete_User(user_array, id))
+                {
+                    printf("\nAccount Deleted Successfully\n\n");
+                }
+                else
+                {
+                    printf("\nUser Not Found\n\n");
+                }
+            }
+        }
+
+        else if (choice == 5)
+        {
+            while (1)
+            {
                 printf("Enter Your ID to Transact: ");
                 scanf("%d", &transaction.user_id);
                 bool result = Read_User(user_array, transaction.user_id, &bank);
-                if(!result){
+                if (!result)
+                {
                     printf("\nUser Not Found\n\n");
                     continue;
                 }
@@ -482,7 +613,8 @@ int main() {
                 printf("Enter the transaction type (0 for CREDIT, 1 for DEBIT, 2 for RECHARGE_CARD): ");
                 int type;
                 scanf("%d", &type);
-                if (type < 0 || type > 2) {
+                if (type < 0 || type > 2)
+                {
                     printf("\nInvalid transaction type. Please enter 0, 1, or 2.\n\n");
                     continue;
                 }
@@ -492,33 +624,40 @@ int main() {
                 transaction.id = transaction_store_index;
                 transaction_store_index++;
                 print_transaction(transaction);
-                if(register_transaction(transaction_array, transaction)){
+                if (register_transaction(transaction_array, transaction))
+                {
                     printf("\nTransaction Successfully, You transfer the amount of %d\n", transaction.amount);
                     printf("Date of Transaction: %s\n\n", &transaction.date);
-                }else{
+                }
+                else
+                {
                     printf("\nTransaction Failed, Bank system is full\n\n");
                 }
                 break;
             }
         }
 
-        else if(choice == 6){
+        else if (choice == 6)
+        {
             printf("Enter Your ID to Read Transaction: ");
             scanf("%d", &user_id);
-            
-            if(!read_transaction(transaction_array, user_id, &transaction)){
+            if (!read_transaction(transaction_array, user_id, &transaction))
+            {
                 printf("\nTransaction Not Found\n\n");
             }
-            else{
+            else
+            {
                 print_transaction(transaction);
             }
         }
 
-        else if(choice == 7){
+        else if (choice == 7)
+        {
             printf("Enter the ID of transaction to update: ");
             int transaction_id;
             scanf("%d", &transaction_id);
-            if(!read_transaction(transaction_array, transaction_id, &transaction)){
+            if (!read_transaction(transaction_array, transaction_id, &transaction))
+            {
                 printf("\nTransaction Not Found\n\n");
                 continue;
             }
@@ -528,119 +667,157 @@ int main() {
             scanf("%s", transaction.account_num);
             printf("Enter New Amount: ");
             scanf("%d", &transaction.amount);
-                if(update_transcation(transaction_array, transaction, transaction_id)){
-                    printf("\nTransaction Updated Successfully\n\n");
-                }
-                else{
-                    printf("\nTransaction Not Found\n\n");
-                }
+            if (update_transcation(transaction_array, transaction, transaction_id))
+            {
+                printf("\nTransaction Updated Successfully\n\n");
             }
-
-        else if(choice == 8){
-            printf("Enter the ID of transaction to delete: ");
-            int transaction_id;
-            scanf("%d", &transaction_id);
-            if(delete_transcation(transaction_array, transaction_id)){
-                printf("\nTransaction Deleted Successfully\n\n");
-            }else{
+            else
+            {
                 printf("\nTransaction Not Found\n\n");
             }
         }
-        else if(choice == 9){
+
+        else if (choice == 8)
+        {
+            printf("Enter the ID of transaction to delete: ");
+            int transaction_id;
+            scanf("%d", &transaction_id);
+            if (delete_transcation(transaction_array, transaction_id))
+            {
+                printf("\nTransaction Deleted Successfully\n\n");
+            }
+            else
+            {
+                printf("\nTransaction Not Found\n\n");
+            }
+        }
+        else if (choice == 9)
+        {
             printf("\nUse dummy user data\n");
-            if (Register_User(user_array, dummy_user)) {
+            if (Register_User(user_array, dummy_user))
+            {
                 user_store_index++;
                 printf("\n DUMMY USER REGISTERED SUCCESSFULLY\n\n");
                 print_user(dummy_user);
                 print_user(user_array[0]);
-            } else {
+            }
+            else
+            {
                 printf("\nDUMMY REGISTRATION FAILED, Bank system is full\n\n");
             }
         }
 
-        else if(choice == 10){
+        else if (choice == 10)
+        {
             printf("Enter Account ID: ");
             scanf("%d", &account_details.id);
-                if(account_details.id != bank.id){
-                    printf("\nInvalid Account ID. Please enter a valid ID.\n\n");
+            if (!Read_User(user_array, bank.id, &bank))
+            {
+                printf("\nUser Not Found\n\n");
+            }
+            else
+            {
+                printf("Enter Account Number: ");
+                scanf("%s", account_details.account_number);
+                printf("Enter Balance: ");
+                scanf("%f", &account_details.balance);
+                printf("Enter Currency Type (0 for NAIRA, 1 for DOLLAR, 2 for POUND): ");
+                scanf("%d", &currency_type);
+                if (currency_type < 0 || currency_type > 2)
+                {
+                    printf("\nInvalid currency type. Please enter 0, 1, or 2.\n\n");
                     continue;
                 }
-            printf("Enter Account Number: ");
-            scanf("%s", account_details.account_number);
-            printf("Enter Balance: ");
-            scanf("%f", &account_details.balance);
-            printf("Enter Currency Type (0 for NAIRA, 1 for DOLLAR, 2 for POUND): ");
-            scanf("%d", &currency_type);
-            if (currency_type < 0 || currency_type > 2) {
-                printf("\nInvalid currency type. Please enter 0, 1, or 2.\n\n");
-                continue;
-            }
-            account_details.currency_type = (enum currency)currency_type;
-            if (register_account(account_array, account_details)){
-                printf("\nACCOUNT REGISTERED SUCCESSFULLY\n\n");
-            } else {
-                printf("\nREGISTRATION FAILED, Bank system is full\n\n");
+                account_details.currency_type = (enum currency)currency_type;
+                if (register_account(account_array, account_details))
+                {
+                    printf("\nACCOUNT REGISTERED SUCCESSFULLY\n\n");
+                }
+                else
+                {
+                    printf("\nREGISTRATION FAILED, Bank system is full\n\n");
+                }
             }
         }
 
-        else if(choice == 11){
+        else if (choice == 11)
+        {
             printf("Enter Account ID to Read: ");
             scanf("%d", &id);
-                if(account_details.id != bank.id){
-                    printf("\nInvalid Account ID. Please enter a valid ID.\n\n");
-                    continue;
-                }
-            if(!read_account(account_array, id, &account_details)){
-                printf("\nAccount Not Found\n\n");
+            if (!Read_User(user_array, bank.id, &bank))
+            {
+                printf("\nUser Not Found\n\n");
             }
-            else{
-                print_account(account_details);
+            else
+            {
+                if (!read_account(account_array, id, &account_details))
+                {
+                    printf("\nAccount Not Found\n\n");
+                }
+                else
+                {
+                    print_account(account_details);
+                }
             }
         }
 
-        else if(choice == 12){
+        else if (choice == 12)
+        {
             printf("Enter Account ID to Update: ");
             scanf("%d", &account_details.id);
-                if(account_details.id != bank.id){
-                    printf("\nInvalid Account ID. Please enter a valid ID.\n\n");
-                    continue;
-                }            
-            printf("Enter New Account Number: ");
-            scanf("%s", account_details.account_number);
-            printf("Enter New Balance: ");
-            scanf("%f", &account_details.balance);
-            printf("Enter New Currency Type (0 for NAIRA, 1 for DOLLAR, 2 for POUND): ");
-            scanf("%d", &currency_type);
-            if (currency_type < 0 || currency_type > 2) {
-                printf("\nInvalid currency type. Please enter 0, 1, or 2.\n\n");
-                continue;
+            if (!Read_User(user_array, bank.id, &bank))
+            {
+                printf("\nUser Not Found\n\n");
             }
-            account_details.currency_type = (enum currency)currency_type;
-            if(update_account(account_array, account_details, account_details.id)){
-                printf("\nAccount Updated Successfully\n\n");
-            }
-            else{
-                printf("\nAccount Not Found\n\n");
-            }
-        }
-
-        else if(choice == 13){
-            printf("Enter Account ID to Delete: ");
-            scanf("%d", &id);
-                if(account_details.id != bank.id){
-                    printf("\nInvalid Account ID. Please enter a valid ID.\n\n");
+            else
+            {
+                printf("Enter New Account Number: ");
+                scanf("%s", account_details.account_number);
+                printf("Enter New Balance: ");
+                scanf("%f", &account_details.balance);
+                printf("Enter New Currency Type (0 for NAIRA, 1 for DOLLAR, 2 for POUND): ");
+                scanf("%d", &currency_type);
+                if (currency_type < 0 || currency_type > 2)
+                {
+                    printf("\nInvalid currency type. Please enter 0, 1, or 2.\n\n");
                     continue;
                 }
-            if(delete_account(account_array, id)){
-                printf("\nAccount Deleted Successfully\n\n");
+                account_details.currency_type = (enum currency)currency_type;
+                if (update_account(account_array, account_details, account_details.id))
+                {
+                    printf("\nAccount Updated Successfully\n\n");
+                }
+                else
+                {
+                    printf("\nAccount Not Found\n\n");
+                }
             }
-            else{
-                printf("\nAccount Not Found\n\n");
-            } 
         }
 
-        else{
+        else if (choice == 13)
+        {
+            printf("Enter Account ID to Delete: ");
+            scanf("%d", &id);
+            if (!Read_User(user_array, bank.id, &bank))
+            {
+                printf("\nUser Not Found\n\n");
+            }
+            else
+            {
+                if (delete_account(account_array, id))
+                {
+                    printf("\nAccount Deleted Successfully\n\n");
+                }
+                else
+                {
+                    printf("\nAccount Not Found\n\n");
+                }
+            }
+        }
+
+        else
+        {
             printf("\nInvalid Choice, Please Try Again\n\n");
         }
     }
-} 
+}
